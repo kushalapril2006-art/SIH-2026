@@ -1,0 +1,40 @@
+services:
+
+  victim:
+    image: nginx:alpine
+    container_name: sih-victim
+    networks:
+      - cyberlab
+
+  attacker:
+    build: ./attacker
+    container_name: sih-attacker
+    stdin_open: true
+    tty: true
+    networks:
+      - cyberlab
+
+  defender:
+    build: ./defender
+    container_name: sih-defender
+    command: ["sleep","infinity"]
+    networks:
+      - cyberlab
+    volumes:
+      - ./telemetry:/telemetry
+      - ./defender:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+  zeek:
+    image: zeek/zeek:latest
+    container_name: sih-zeek
+    network_mode: host
+    command: ["zeek", "-C", "-i", "sih-br" ,"Log::default_logdir=/logs"]
+    volumes:
+      - ./telemetry:/logs
+
+networks:
+  cyberlab:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: sih-br
+    internal: true

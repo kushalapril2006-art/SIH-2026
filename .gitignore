@@ -1,0 +1,5 @@
+telemetry/*.log
+telemetry/events.json
+__pycache__/
+*.pyc
+.env
